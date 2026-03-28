@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Euclide R. Lasconia — Engineering Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f0e;
+    --surface: #141614;
+    --surface2: #1c1f1c;
+    --border: #2a2e2a;
+    --accent: #b8e04a;
+    --accent2: #4ae0a0;
+    --text: #e8ece8;
+    --muted: #7a887a;
+    --dim: #3d443d;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13, 15, 14, 0.85);
+    backdrop-filter: blur(20px);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 8rem 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(184,224,74,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-content { max-width: 560px; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(184,224,74,0.3);
+    padding: 0.35rem 0.75rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.2s;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.35s;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.5s;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.65s;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0d0f0e;
+    border: 1px solid var(--accent);
+    font-weight: 600;
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--muted);
+    color: var(--text);
+  }
+
+  /* HERO VISUAL */
+  .hero-visual {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 0.5s;
+  }
+
+  .profile-frame {
+    position: relative;
+    width: 340px; height: 420px;
+  }
+
+  .profile-frame::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    z-index: 0;
+  }
+
+  .profile-frame::after {
+    content: '';
+    position: absolute;
+    bottom: -12px; right: -12px;
+    width: 100%; height: 100%;
+    border: 1px solid rgba(184,224,74,0.3);
+    border-radius: 4px;
+    z-index: 0;
+  }
+
+  .profile-placeholder {
+    width: 100%; height: 100%;
+    background: var(--surface2);
+    border-radius: 4px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    overflow: hidden;
+  }
+
+  .profile-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(184,224,74,0.04) 0%, transparent 60%);
+  }
+
+  .profile-initial {
+    font-family: 'DM Serif Display', serif;
+    font-size: 5rem;
+    color: var(--accent);
+    opacity: 0.8;
+    line-height: 1;
+  }
+
+  .profile-name-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .stat-chips {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    z-index: 2;
+  }
+
+  .chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--accent2);
+    background: rgba(74,224,160,0.08);
+    border: 1px solid rgba(74,224,160,0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 6rem 3rem;
+    border-top: 1px solid var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 3rem;
+  }
+
+  /* EXPERIENCE */
+  .exp-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .exp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    transition: border-color 0.25s, transform 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .exp-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s ease;
+  }
+
+  .exp-card:hover {
+    border-color: var(--dim);
+    transform: translateX(4px);
+  }
+
+  .exp-card:hover::before { transform: scaleY(1); }
+
+  .exp-company {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .exp-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .exp-location {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .exp-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+
+  /* SKILLS */
+  .skills-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.75rem;
+  }
+
+  .skill-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .skill-tag {
+    font-size: 0.8rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .skill-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* EDUCATION */
+  .edu-timeline {
+    position: relative;
+    display: grid;
+    gap: 0;
+  }
+
+  .edu-timeline::before {
+    content: '';
+    position: absolute;
+    left: 1.5rem;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .edu-item {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1.5rem;
+    padding-bottom: 2.5rem;
+    position: relative;
+  }
+
+  .edu-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--bg);
+    margin-top: 0.4rem;
+    justify-self: center;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 4px rgba(184,224,74,0.1);
+  }
+
+  .edu-degree {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .edu-school {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .edu-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* REFERENCES */
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .ref-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.75rem;
+    transition: border-color 0.25s;
+  }
+
+  .ref-card:hover { border-color: var(--dim); }
+
+  .ref-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .ref-title {
+    font-size: 0.8rem;
+    color: var(--accent2);
+    margin-bottom: 1rem;
+  }
+
+  .ref-contact {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    line-height: 1.8;
+  }
+
+  /* CONTACT */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .contact-info { display: grid; gap: 1rem; }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .contact-icon {
+    font-size: 1rem;
+    width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .contact-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .contact-val {
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .contact-cta {
+    text-align: center;
+  }
+
+  .contact-cta p {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+    color: var(--text);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero {
+      grid-template-columns: 1fr;
+      padding: 7rem 1.5rem 3rem;
+      text-align: center;
+    }
+    .hero-visual { display: none; }
+    .hero-cta { justify-content: center; }
+    section { padding: 4rem 1.5rem; }
+    .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">ERL · Portfolio</span>
+  <ul class="nav-links">
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div style="max-width:1200px; margin:0 auto;">
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Electronics & Communication Engineer</div>
+    <h1>Euclide R.<br><em>Lasconia</em></h1>
+    <p class="hero-sub">Process Engineer & Technical Specialist with expertise in quality systems, ATE programming, root cause analysis, and site surveillance — based in Cavite, Philippines.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn btn-primary">Get in Touch</a>
+      <a href="#experience" class="btn btn-ghost">View Experience</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="profile-frame">
+      <div class="profile-placeholder">
+        <div class="profile-initial">EL</div>
+        <div class="profile-name-tag">Euclide R. Lasconia</div>
+        <div class="stat-chips">
+          <span class="chip">ECE Graduate</span>
+          <span class="chip">ISO Certified</span>
+          <span class="chip">ATE Expert</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">01 / Work History</div>
+  <h2 class="section-title">Professional<br><em style="font-style:italic;color:var(--accent)">Experience</em></h2>
+  <div class="exp-grid reveal">
+
+    <div class="exp-card">
+      <div>
+        <div class="exp-company">TeamQuest Technology Inc.</div>
+        <div class="exp-role">Process Engineer</div>
+        <div class="exp-location">Dasmariñas, Cavite</div>
+      </div>
+      <div class="exp-period">Oct 2024<br>— Mar 2026</div>
+    </div>
+
+    <div class="exp-card">
+      <div>
+        <div class="exp-company">Somico Steel Mill Corporation</div>
+        <div class="exp-role">CCTV Staff</div>
+        <div class="exp-location">Trece Martires, Cavite</div>
+      </div>
+      <div class="exp-period">Feb 2024<br>— Aug 2024</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">02 / Capabilities</div>
+  <h2 class="section-title">Technical<br><em style="font-style:italic;color:var(--accent)">Skills</em></h2>
+  <div class="skills-layout reveal">
+
+    <div class="skill-group">
+      <div class="skill-group-title">Software & Tools</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Microsoft Office</span>
+        <span class="skill-tag">Eagle Software</span>
+        <span class="skill-tag">Circuit Wizard</span>
+        <span class="skill-tag">PCB Design Layout</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Quality Standards</div>
+      <div class="skill-tags">
+        <span class="skill-tag">ISO 9001</span>
+        <span class="skill-tag">IATF 16949</span>
+        <span class="skill-tag">ISO 17025</span>
+        <span class="skill-tag">FMEA</span>
+        <span class="skill-tag">Control Plan</span>
+        <span class="skill-tag">OPL / OCAP</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Engineering Methods</div>
+      <div class="skill-tags">
+        <span class="skill-tag">8D Problem Solving</span>
+        <span class="skill-tag">Root Cause Analysis</span>
+        <span class="skill-tag">Fishbone Diagram</span>
+        <span class="skill-tag">Fault Tree Analysis</span>
+        <span class="skill-tag">Why-Why Analysis</span>
+        <span class="skill-tag">DOE</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Measurement & Testing</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Caliper</span>
+        <span class="skill-tag">Micrometer</span>
+        <span class="skill-tag">CMM / VMM</span>
+        <span class="skill-tag">HG / QS / CMI</span>
+        <span class="skill-tag">EDA Oven System</span>
+        <span class="skill-tag">Abrel Endzone</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">ATE & IC Testing</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Burn-in Test</span>
+        <span class="skill-tag">Static Programs</span>
+        <span class="skill-tag">Dynamic Programs</span>
+        <span class="skill-tag">SPI / VON</span>
+        <span class="skill-tag">Mixed SPI / VMON</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <div class="skill-group-title">Other Skills</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Visual Failure Analysis</span>
+        <span class="skill-tag">Mechanical Drawing</span>
+        <span class="skill-tag">Bubble Drawing</span>
+        <span class="skill-tag">CCTV Surveillance</span>
+        <span class="skill-tag">Intrusion Detection</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-label">03 / Academic Background</div>
+  <h2 class="section-title">Educational<br><em style="font-style:italic;color:var(--accent)">Background</em></h2>
+  <div class="edu-timeline reveal">
+
+    <div class="edu-item">
+      <div class="edu-dot"></div>
+      <div>
+        <div class="edu-degree">BS Electronics & Communication Engineering</div>
+        <div class="edu-school">National College of Science and Technology · Dasmariñas, Cavite</div>
+        <div class="edu-year">2019 – 2023</div>
+      </div>
+    </div>
+
+    <div class="edu-item">
+      <div class="edu-dot" style="background:var(--accent2); box-shadow:0 0 0 4px rgba(74,224,160,0.1);"></div>
+      <div>
+        <div class="edu-degree">Senior High School</div>
+        <div class="edu-school">Saint Jude Parish School · Trece Martires City, Cavite</div>
+        <div class="edu-year">2017 – 2019</div>
+      </div>
+    </div>
+
+    <div class="edu-item" style="padding-bottom:0;">
+      <div class="edu-dot" style="background:var(--dim); box-shadow:none;"></div>
+      <div>
+        <div class="edu-degree">Primary Education</div>
+        <div class="edu-school">Manggahan Elementary School · General Trias City, Cavite</div>
+        <div class="edu-year">2007 – 2013</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section id="references">
+  <div class="section-label">04 / References</div>
+  <h2 class="section-title">Professional<br><em style="font-style:italic;color:var(--accent)">References</em></h2>
+  <div class="ref-grid reveal">
+
+    <div class="ref-card">
+      <div class="ref-name">Chester Jericho Ramos</div>
+      <div class="ref-title">Mechanical Engineer · Mckupler Inc.</div>
+      <div class="ref-contact">
+        📞 (0915) 899 8304<br>
+        ✉ cjoramos.98@gmail.com
+      </div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-name">George Nicholas Cabrera</div>
+      <div class="ref-title">Biomedical Engineer · Toyo Adtec Healthcare Products</div>
+      <div class="ref-contact">
+        📞 (0977) 288 7645<br>
+        ✉ Georgenicholascabrera14@gmail.com
+      </div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-name">John Paul Kelvin G. New</div>
+      <div class="ref-title">REL Supervisor · TeamQuest Technology Inc.</div>
+      <div class="ref-contact">
+        📞 (0908) 727 8536<br>
+        ✉ paul.new@teamquest-inc.com.ph
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">05 / Get in Touch</div>
+  <div class="contact-grid reveal">
+    <div>
+      <h2 class="section-title" style="margin-bottom:1.5rem;">Let's work<br><em style="font-style:italic;color:var(--accent)">together.</em></h2>
+      <p style="color:var(--muted);font-size:0.95rem;max-width:340px;">Open to new roles in process engineering, quality systems, and technical operations across Cavite and Metro Manila.</p>
+    </div>
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-label">Location</div>
+          <div class="contact-val">Manggahan, General Trias City, Cavite</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-label">Mobile</div>
+          <div class="contact-val">09300343319</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">✉</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-val">lasconia.euclide@gmail.com</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Euclide R. Lasconia · All rights reserved</p>
+  <p>Electronics & Communication Engineering · Cavite, PH</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Smooth nav highlight
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const sections = document.querySelectorAll('section[id]');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+    });
+  });
+</script>
+</body>
+</html>
