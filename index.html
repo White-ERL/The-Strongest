@@ -657,7 +657,7 @@
   <div class="hero-visual">
     <div class="profile-frame">
       <div class="profile-placeholder">
-        <div class="profile-initial">EL</div>
+        <img src="your-photo.jpg" alt="Euclide R. Lasconia" class="profile-img">
         <div class="profile-name-tag">Euclide R. Lasconia</div>
         <div class="stat-chips">
           <span class="chip">ECE Graduate</span>
@@ -669,6 +669,13 @@
   </div>
 </div>
 </div>
+
+ .profile-img {
+    width: 150px;       /* adjust size as needed */
+    height: 150px;
+    border-radius: 50%; /* makes it a circle */
+    object-fit: cover;  /* crops it nicely */
+}
 
 <!-- EXPERIENCE -->
 <section id="experience">
